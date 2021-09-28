@@ -25,25 +25,25 @@ If you decide to have separate file for main.go and the chaincode folder you hav
 project folder ex phase3 where you have folder chaincode and file main.go 
 and enter command *go mod init phase3* . The main file has to look like this
 
-				package main
+		package main
 
-				import (
-					"log"
+		import (
+			"log"
 
-					"github.com/hyperledger/fabric-contract-api-go/contractapi"
-					"phase3/chaincode"
-				)
+			"github.com/hyperledger/fabric-contract-api-go/contractapi"
+			"phase3/chaincode"
+			)
 
-				func main() {
-					assetChaincode, err := contractapi.NewChaincode(&chaincode.SmartContract{})
-					if err != nil {
-						log.Panicf("Error creating asset-transfer-private-data chaincode: %v", err)
-					}
+		func main() {
+			assetChaincode, err := contractapi.NewChaincode(&chaincode.SmartContract{})
+			if err != nil {
+				log.Panicf("Error creating asset-transfer-private-data chaincode: %v", err)
+			}
 
-					if err := assetChaincode.Start(); err != nil {
-						log.Panicf("Error starting asset-transfer-private-data chaincode: %v", err)
-					}
-				}
+			if err := assetChaincode.Start(); err != nil {
+				log.Panicf("Error starting asset-transfer-private-data chaincode: %v", err)
+			}
+		}
 				
 				
 
