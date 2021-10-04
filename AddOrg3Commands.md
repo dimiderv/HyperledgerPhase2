@@ -25,16 +25,20 @@ Enviroment Variable to be able to install chaincode as org3, assuming that a cha
 
 #Step 5:
 Package chaincode 
-		peer lifecycle chaincode package try.tar.gz --path ../phase2/ --lang golang --label try_1.0
+
+			peer lifecycle chaincode package try.tar.gz --path ../phase2/ --lang golang --label try_1.0
 
 Install
-		peer lifecycle chaincode install try.tar.gz
+
+			peer lifecycle chaincode install try.tar.gz
 		
 Get packageID 
-		peer lifecycle chaincode queryinstalled
+	
+			peer lifecycle chaincode queryinstalled
 
 Create enviroment variable for package
-		export CC_PACKAGE_ID=try_1.0:c458900a13a84e71c3ec1391fa61fd4c1e5eef560c5ef3ad49f580582a88bb87
+	
+			export CC_PACKAGE_ID=try_1.0:c458900a13a84e71c3ec1391fa61fd4c1e5eef560c5ef3ad49f580582a88bb87
 
 Approve for Org3 ( --signature-policy and --collections-config are optional and depend on the chaincode)
 
