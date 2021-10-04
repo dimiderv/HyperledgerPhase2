@@ -17,7 +17,7 @@ func (s *SmartContract) ReadTransferAgreement(ctx contractapi.TransactionContext
 		return nil, fmt.Errorf("failed to create composite key: %v", err)
 	}
 
-	buyerIdentity, err := ctx.GetStub().GetState(transferAgreeKey) // Get the identity from collection
+	buyerIdentity, err := ctx.GetStub().GetState(transferAgreeKey) // Get the state from world state
 	if err != nil {
 		return nil, fmt.Errorf("failed to read TransferAgreement: %v", err)
 	}

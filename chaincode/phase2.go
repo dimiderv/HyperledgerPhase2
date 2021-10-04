@@ -25,7 +25,7 @@ type SmartContract struct {
 type Asset struct {
   ID             string `json:"ID"`
   Color          string `json:"color"`
-  Size           int    `json:"size"`
+  Weight           int    `json:"weight"`
   Owner          string `json:"owner"`
   AppraisedValue int    `json:"appraisedValue"`
   Timestamp time.Time `json:"timestamp"`
@@ -38,6 +38,19 @@ type Asset struct {
 
 // InitLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
+	
+	
+	temp := ctx.GetClientIdentity().AssertAttributeValue("retailer", "true")
+	if temp==nil {
+		return fmt.Errorf("submitting client not authorized to create asset, he is a Retailer")
+	}
+
+	err := ctx.GetClientIdentity().AssertAttributeValue("farmer", "true")
+	if err != nil {
+		return fmt.Errorf("submitting client not authorized to create asset, he is not a Farmer")
+	}
+	
+	
 	timeS,err:= ctx.GetStub().GetTxTimestamp()
 	if err != nil {
 		return  err
@@ -56,12 +69,12 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	}
 
   assets := []Asset{
-    {ID: "asset1", Color: "blue", 	Size: 5,  Owner: clientID, AppraisedValue: 300,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
-    {ID: "asset2", Color: "red", 	Size: 5,  Owner: clientID, AppraisedValue: 400,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
-    {ID: "asset3", Color: "green", 	Size: 10, Owner: clientID, AppraisedValue: 500,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
-    {ID: "asset4", Color: "yellow", Size: 10, Owner: clientID, AppraisedValue: 600,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
-    {ID: "asset5", Color: "black", 	Size: 15, Owner: clientID, AppraisedValue: 700,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
-    {ID: "asset6", Color: "white", 	Size: 15, Owner: clientID, AppraisedValue: 800,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
+    {ID: "asset1", Color: "blue", 	Weight: 5,  Owner: clientID, AppraisedValue: 30,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
+    {ID: "asset2", Color: "orange", 	Weight: 5,  Owner: clientID, AppraisedValue: 40,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
+    {ID: "asset3", Color: "green", 	Weight: 10, Owner: clientID, AppraisedValue: 50,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
+    {ID: "asset4", Color: "yellow", Weight: 10, Owner: clientID, AppraisedValue: 60,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
+    {ID: "asset5", Color: "black", 	Weight: 15, Owner: clientID, AppraisedValue: 70,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
+    {ID: "asset6", Color: "pink", 	Weight: 15, Owner: clientID, AppraisedValue: 80,Timestamp: timestamp,Creator: creatorDN,TransferedTo:""},
   }
 
   for _, asset := range assets {
@@ -80,7 +93,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 }
 
 // CreateAsset issues a new asset to the world state with given details.
-func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, color string, size int, appraisedValue int) error {
+func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface, id string, color string, weight int, appraisedValue int) error {
 
 
 	
@@ -125,12 +138,12 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	asset := Asset{
 		ID:             id,
 		Color:          color,
-		Size:           size,
+		Weight:         weight,
 		Owner:          clientID,
 		AppraisedValue: appraisedValue,
-		Timestamp: timestamp,
+		Timestamp: 		timestamp,
 		Creator:        creatorDN,
-		TransferedTo: ""}
+		TransferedTo: 	""}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
 		return err
@@ -140,7 +153,7 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 }
 
 // UpdateAsset updates an existing asset in the world state with provided parameters.
-func (s *SmartContract) UpdateAsset(ctx contractapi.TransactionContextInterface, id string, newColor string, newSize int, newValue int) error {
+func (s *SmartContract) UpdateAsset(ctx contractapi.TransactionContextInterface, id string, newColor string, newWeight int, newValue int) error {
 
 	asset, err := s.ReadAsset(ctx, id)
 	if err != nil {
@@ -157,7 +170,7 @@ func (s *SmartContract) UpdateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	asset.Color = newColor
-	asset.Size = newSize
+	asset.Weight = newWeight
 	asset.AppraisedValue = newValue
 
 	assetJSON, err := json.Marshal(asset)

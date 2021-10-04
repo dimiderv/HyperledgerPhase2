@@ -32,7 +32,19 @@ type TransferAgreement struct {
 }
 
 func (s *SmartContract) CreatePrivateAsset(ctx contractapi.TransactionContextInterface) error {
+	
+	
+	temp := ctx.GetClientIdentity().AssertAttributeValue("retailer", "true")
+	if temp==nil {
+		return fmt.Errorf("submitting client not authorized to create asset, he is a Retailer")
+	}
 
+	err := ctx.GetClientIdentity().AssertAttributeValue("farmer", "true")
+	if err != nil {
+		return fmt.Errorf("submitting client not authorized to create asset, he is not a Farmer")
+	}
+	
+		
 	// Get new asset from transient map
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
@@ -50,7 +62,7 @@ func (s *SmartContract) CreatePrivateAsset(ctx contractapi.TransactionContextInt
 		//0Type           string `json:"objectType"` //Type is used to distinguish the various types of objects in state database
 		ID             string `json:"assetID"`
 		Color          string `json:"color"`
-		Size           int    `json:"size"`
+		Weight           int    `json:"weight"`
 		Timestamp time.Time `json:"timestamp"`
 		Creator string `json:creator`
 		AppraisedValue int    `json:"appraisedValue"`
@@ -72,8 +84,8 @@ func (s *SmartContract) CreatePrivateAsset(ctx contractapi.TransactionContextInt
 	if len(assetInput.Color) == 0 {
 		return fmt.Errorf("color field must be a non-empty string")
 	}
-	if assetInput.Size <= 0 {
-		return fmt.Errorf("size field must be a positive integer")
+	if assetInput.Weight <= 0 {
+		return fmt.Errorf("Weight field must be a positive integer")
 	}
 	if assetInput.AppraisedValue <= 0 {
 		return fmt.Errorf("appraisedValue field must be a positive integer")
@@ -83,7 +95,7 @@ func (s *SmartContract) CreatePrivateAsset(ctx contractapi.TransactionContextInt
 		return fmt.Errorf("Secret field is needed ")
 	}
 
-
+	//might not be needed
 	// Check if asset already exists
 	assetAsBytes, err := ctx.GetStub().GetPrivateData(assetCollection, assetInput.ID)
 	if err != nil {
@@ -126,7 +138,7 @@ func (s *SmartContract) CreatePrivateAsset(ctx contractapi.TransactionContextInt
 	asset := Asset{
 		ID:    assetInput.ID,
 		Color: assetInput.Color,
-		Size:  assetInput.Size,
+		Weight:  assetInput.Weight,
 		Owner: clientID,
 		Timestamp:  timestamp,
 		Creator: creatorDN,
@@ -282,7 +294,7 @@ func (s *SmartContract) TransferPrivateAsset(ctx contractapi.TransactionContextI
 		return fmt.Errorf("buyerMSP field must be a non-empty string")
 	}
 	log.Printf("TransferAsset: verify asset exists ID %v", assetTransferInput.ID)
-	// Read asset from the private data collection
+	// Read asset from world State
 	asset, err := s.ReadAsset(ctx, assetTransferInput.ID)
 	if err != nil {
 		return fmt.Errorf("error reading asset: %v", err)
